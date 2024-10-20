@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.PeixunDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.yuangong_id as yuangongId
+        ,a.peixun_uuid_number as peixunUuidNumber
+        ,a.peixun_name as peixunName
+        ,a.peixun_types as peixunTypes
+        ,a.kaishi_time as kaishiTime
+        ,a.jieshu_time as jieshuTime
+        ,a.peixun_content as peixunContent
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.PeixunView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+        ,yuangong.yuangong_name as yuangongName
+        ,yuangong.yuangong_phone as yuangongPhone
+        ,yuangong.yuangong_id_number as yuangongIdNumber
+        ,yuangong.yuangong_photo as yuangongPhoto
+        ,yuangong.bumen_types as bumenTypes
+        ,yuangong.zhiwei_types as zhiweiTypes
+        ,yuangong.yuangong_email as yuangongEmail
+        ,yuangong.xueli_types as xueliTypes
+        ,yuangong.yuangong_jiaoyu_content as yuangongJiaoyuContent
+        ,yuangong.yuangong_gongzuo_content as yuangongGongzuoContent
+        ,yuangong.shangpin_shixi_content as shangpinShixiContent
+        ,yuangong.shangpin_rongu_content as shangpinRonguContent
+        ,yuangong.jinyong_types as jinyongTypes
+
+        FROM peixun  a
+        left JOIN yuangong yuangong ON a.yuangong_id = yuangong.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.yuangongId != null and params.yuangongId != ''">
+                and (
+                    a.yuangong_id = #{params.yuangongId}
+                )
+            </if>
+            <if test=" params.peixunUuidNumber != '' and params.peixunUuidNumber != null and params.peixunUuidNumber != 'null' ">
+                and a.peixun_uuid_number like CONCAT('%',#{params.peixunUuidNumber},'%')
+            </if>
+            <if test=" params.peixunName != '' and params.peixunName != null and params.peixunName != 'null' ">
+                and a.peixun_name like CONCAT('%',#{params.peixunName},'%')
+            </if>
+            <if test="params.peixunTypes != null and params.peixunTypes != ''">
+                and a.peixun_types = #{params.peixunTypes}
+            </if>
+            <if test=" params.kaishiTimeStart != '' and params.kaishiTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.kaishi_time) >= UNIX_TIMESTAMP(#{params.kaishiTimeStart}) ]]>
+            </if>
+            <if test=" params.kaishiTimeEnd != '' and params.kaishiTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.kaishi_time) <= UNIX_TIMESTAMP(#{params.kaishiTimeEnd}) ]]>
+            </if>
+            <if test="params.kaishiTime != null and params.kaishiTime != ''">
+                and a.kaishi_time = #{params.kaishiTime}
+            </if>
+            <if test=" params.jieshuTimeStart != '' and params.jieshuTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.jieshu_time) >= UNIX_TIMESTAMP(#{params.jieshuTimeStart}) ]]>
+            </if>
+            <if test=" params.jieshuTimeEnd != '' and params.jieshuTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.jieshu_time) <= UNIX_TIMESTAMP(#{params.jieshuTimeEnd}) ]]>
+            </if>
+            <if test="params.jieshuTime != null and params.jieshuTime != ''">
+                and a.jieshu_time = #{params.jieshuTime}
+            </if>
+            <if test=" params.peixunContent != '' and params.peixunContent != null and params.peixunContent != 'null' ">
+                and a.peixun_content like CONCAT('%',#{params.peixunContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+                <!-- 判断员工的id不为空 -->
+            <if test=" params.yuangongIdNotNull != '' and params.yuangongIdNotNull != null and params.yuangongIdNotNull != 'null' ">
+                and a.yuangong_id IS NOT NULL
+            </if>
+            <if test=" params.yuangongName != '' and params.yuangongName != null and params.yuangongName != 'null' ">
+                and yuangong.yuangong_name like CONCAT('%',#{params.yuangongName},'%')
+            </if>
+            <if test=" params.yuangongPhone != '' and params.yuangongPhone != null and params.yuangongPhone != 'null' ">
+                and yuangong.yuangong_phone like CONCAT('%',#{params.yuangongPhone},'%')
+            </if>
+            <if test=" params.yuangongIdNumber != '' and params.yuangongIdNumber != null and params.yuangongIdNumber != 'null' ">
+                and yuangong.yuangong_id_number like CONCAT('%',#{params.yuangongIdNumber},'%')
+            </if>
+            <if test="params.bumenTypes != null  and params.bumenTypes != ''">
+                and yuangong.bumen_types = #{params.bumenTypes}
+            </if>
+
+            <if test="params.zhiweiTypes != null  and params.zhiweiTypes != ''">
+                and yuangong.zhiwei_types = #{params.zhiweiTypes}
+            </if>
+
+            <if test=" params.yuangongEmail != '' and params.yuangongEmail != null and params.yuangongEmail != 'null' ">
+                and yuangong.yuangong_email like CONCAT('%',#{params.yuangongEmail},'%')
+            </if>
+            <if test="params.xueliTypes != null  and params.xueliTypes != ''">
+                and yuangong.xueli_types = #{params.xueliTypes}
+            </if>
+
+            <if test=" params.yuangongJiaoyuContent != '' and params.yuangongJiaoyuContent != null and params.yuangongJiaoyuContent != 'null' ">
+                and yuangong.yuangong_jiaoyu_content like CONCAT('%',#{params.yuangongJiaoyuContent},'%')
+            </if>
+            <if test=" params.yuangongGongzuoContent != '' and params.yuangongGongzuoContent != null and params.yuangongGongzuoContent != 'null' ">
+                and yuangong.yuangong_gongzuo_content like CONCAT('%',#{params.yuangongGongzuoContent},'%')
+            </if>
+            <if test=" params.shangpinShixiContent != '' and params.shangpinShixiContent != null and params.shangpinShixiContent != 'null' ">
+                and yuangong.shangpin_shixi_content like CONCAT('%',#{params.shangpinShixiContent},'%')
+            </if>
+            <if test=" params.shangpinRonguContent != '' and params.shangpinRonguContent != null and params.shangpinRonguContent != 'null' ">
+                and yuangong.shangpin_rongu_content like CONCAT('%',#{params.shangpinRonguContent},'%')
+            </if>
+            <if test="params.jinyongTypes != null  and params.jinyongTypes != ''">
+                and yuangong.jinyong_types = #{params.jinyongTypes}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>

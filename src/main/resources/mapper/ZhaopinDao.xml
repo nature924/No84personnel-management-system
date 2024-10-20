@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.ZhaopinDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.zhaopin_uuid_number as zhaopinUuidNumber
+        ,a.zhaopin_name as zhaopinName
+        ,a.zhaopin_photo as zhaopinPhoto
+        ,a.zhaopin_address as zhaopinAddress
+        ,a.zhaopin_file as zhaopinFile
+        ,a.zhaopin_types as zhaopinTypes
+        ,a.zhaopin_number as zhaopinNumber
+        ,a.zhaopin_time as zhaopinTime
+        ,a.zhaopin_content as zhaopinContent
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.ZhaopinView" >
+        SELECT
+        <include refid="Base_Column_List" />
+        <!-- 级联表的字段 -->
+
+        FROM zhaopin  a
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test=" params.zhaopinUuidNumber != '' and params.zhaopinUuidNumber != null and params.zhaopinUuidNumber != 'null' ">
+                and a.zhaopin_uuid_number like CONCAT('%',#{params.zhaopinUuidNumber},'%')
+            </if>
+            <if test=" params.zhaopinName != '' and params.zhaopinName != null and params.zhaopinName != 'null' ">
+                and a.zhaopin_name like CONCAT('%',#{params.zhaopinName},'%')
+            </if>
+            <if test=" params.zhaopinAddress != '' and params.zhaopinAddress != null and params.zhaopinAddress != 'null' ">
+                and a.zhaopin_address like CONCAT('%',#{params.zhaopinAddress},'%')
+            </if>
+            <if test="params.zhaopinTypes != null and params.zhaopinTypes != ''">
+                and a.zhaopin_types = #{params.zhaopinTypes}
+            </if>
+            <if test="params.zhaopinNumberStart != null and params.zhaopinNumberStart != ''">
+                <![CDATA[  and a.zhaopin_number >= #{params.zhaopinNumberStart}   ]]>
+            </if>
+            <if test="params.zhaopinNumberEnd != null and params.zhaopinNumberEnd != ''">
+                <![CDATA[  and a.zhaopin_number <= #{params.zhaopinNumberEnd}   ]]>
+            </if>
+             <if test="params.zhaopinNumber != null and params.zhaopinNumber != ''">
+                and a.zhaopin_number = #{params.zhaopinNumber}
+             </if>
+            <if test=" params.zhaopinTimeStart != '' and params.zhaopinTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.zhaopin_time) >= UNIX_TIMESTAMP(#{params.zhaopinTimeStart}) ]]>
+            </if>
+            <if test=" params.zhaopinTimeEnd != '' and params.zhaopinTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.zhaopin_time) <= UNIX_TIMESTAMP(#{params.zhaopinTimeEnd}) ]]>
+            </if>
+            <if test="params.zhaopinTime != null and params.zhaopinTime != ''">
+                and a.zhaopin_time = #{params.zhaopinTime}
+            </if>
+            <if test=" params.zhaopinContent != '' and params.zhaopinContent != null and params.zhaopinContent != 'null' ">
+                and a.zhaopin_content like CONCAT('%',#{params.zhaopinContent},'%')
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+            <if test="params.insertTime != null and params.insertTime != ''">
+                and a.insert_time = #{params.insertTime}
+            </if>
+
+        </where>
+        order by a.${params.sort} ${params.order}
+    </select>
+
+</mapper>
